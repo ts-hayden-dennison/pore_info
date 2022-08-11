@@ -280,7 +280,7 @@ if __name__ == "__main__":
 						default=10)
 	parser.add_argument('-r', '--residue', type=int, help='The residue number to pick', required=True)
 	
-	atomgroup.add_argument('-an', '--atomn', type=str, help='The sidechain atom name on the specific residue to pick', \
+	parser.add_argument('-an', '--atomn', type=str, help='The sidechain atom name on the specific residue to pick', \
 							default='CZ')
 	
 	
