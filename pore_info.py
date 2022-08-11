@@ -81,7 +81,7 @@ def draw_scaled(geom, output, fnumber, i=0):
 	os.rename(name, os.path.join(data_dir, name))
 	return
 
-def pore_numbers_3mt6(trajfile, topfile, chainlist, fskip, output):
+def pore_numbers_3mt6(trajfile, topfile, chainlist, fskip, output, residue, sidechain):
 	# for each frame calculate the pore width and other variables
 	# assumes that indices denotes the ARG residues that are members of the pores
 	# angledata shape is (chainID, frames, 2) (theta angle, azimuthal angle)
@@ -94,9 +94,9 @@ def pore_numbers_3mt6(trajfile, topfile, chainlist, fskip, output):
 	poredata = []
 	chains = ' '.join([str(x) for x in chainlist])
 	
-	CAs = top.select('name CA and residue 15 and resname ARG and chainid ' + chains)
+	CAs = top.select('name CA and residue {} and chainid '.format(residue) + chains)
 	
-	CZs = top.select('name CZ and residue 15 and resname ARG and chainid ' + chains)
+	CZs = top.select('name {} and residue {} and chainid '.format(sidechain, residue) + chains)
 	imgs = []
 	for fnumber, frame in enumerate(traj):
 		poredata.append([0, 0, 0])
@@ -278,6 +278,12 @@ if __name__ == "__main__":
 	parser.add_argument('-o', '--output', type=str, help='The prefix of the output files', default='3mt6')
 	parser.add_argument('-fs', '--frameskip', type=int, help='Every frameskip frames, output a picture of the pore', \
 						default=10)
+	parser.add_argument('-r', '--residue', type=int, help='The residue number to pick', required=True)
+	
+	atomgroup.add_argument('-an', '--atomn', type=str, help='The sidechain atom name on the specific residue to pick', \
+							default='CZ')
+	
+	
 	args = parser.parse_args()
 	
 	data_dir = '{}_out'.format(args.output)
@@ -289,7 +295,10 @@ if __name__ == "__main__":
 		os.mkdir('{}_poreseg_out'.format(args.output))
 	except FileExistsError:
 		pass
-	angledata, poredata, imgs = pore_numbers_3mt6(args.trajectory, args.topology, args.chains, args.frameskip, args.output)
+	
+	
+	
+	angledata, poredata, imgs = pore_numbers_3mt6(args.trajectory, args.topology, args.chains, args.frameskip, args.output, args.residue, args.atomn)
 	
 	for i, img in enumerate(imgs):
 		name = '{}_frame_{}.png'.format(args.output, i*args.frameskip)
