@@ -1,0 +1,2 @@
+
+pore_info.py uses the standard Gromacs units (namely, nm for distances/coordinates), except it converts angles into degrees.
